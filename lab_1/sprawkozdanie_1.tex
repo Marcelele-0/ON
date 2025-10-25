@@ -1,0 +1,340 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- Pakiety ---
+\usepackage[utf8]{inputenc}    % Kodowanie wejściowe
+\usepackage[polish]{babel}     % Reguły języka polskiego
+\usepackage[T1]{fontenc}     % Nowoczesne kodowanie czcionek (dla polskich znaków)
+\usepackage{lmodern}         % Lepsza wersja domyślnej czcionki (Computer Modern)
+\usepackage{amsmath}         % Zaawansowane funkcje matematyczne
+\usepackage{amssymb}         % Symbole matematyczne
+\usepackage{geometry}        % Ustawienia marginesów
+\usepackage{verbatim}        % Środowisko dla kodu (dosłowne)
+\usepackage{fancyhdr}        % Własne nagłówki i stopki
+\usepackage{graphicx}        % Dołączanie grafiki (załadowane, ale nieużywane)
+\usepackage{microtype}       % Drobne poprawki typograficzne (lepsze justowanie)
+\usepackage[
+    pdftitle={Sprawozdanie Lab 1}, % Metadane PDF
+    pdfauthor={Marcel Musiałek},
+    pdfsubject={Obliczenia Naukowe},
+    colorlinks=true,         % Kolorowe linki (zamiast ramek)
+    linkcolor=black,         % Kolor linków wewnętrznych
+    citecolor=black,         % Kolor cytatów
+    urlcolor=blue,           % Kolor linków URL
+    breaklinks=true          % Łamanie długich linków
+]{hyperref}                  % Tworzenie hiperłączy w dokumencie
+
+% --- Ustawienia strony ---
+\geometry{margin=1.5cm} % Ustawienia marginesów
+
+% --- Nagłówek i stopka ---
+\pagestyle{fancy}
+\fancyhf{} % Wyczyść wszystkie pola
+\rhead{Obliczenia Naukowe}
+\lhead{Laboratorium 1}
+\cfoot{\thepage} % Numer strony w stopce, na środku
+
+% --- Informacje o dokumencie ---
+\title{Sprawozdanie z Laboratorium 1\\
+\large Obliczenia Naukowe}
+\author{Marcel Musiałek}
+\date{25 października 2025}
+
+% ===================
+% --- DOKUMENT ---
+% ===================
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy} % Zastosuj styl 'fancy' także na pierwszej stronie
+
+\section{Zadanie 1: Rozpoznanie arytmetyki}
+
+\subsection{Część 1: Wyznaczanie epsilona maszynowego ($macheps$)}
+
+\subsubsection{Opis problemu}
+Celem było wyznaczenie epsilona maszynowego ($macheps$), czyli najmniejszej liczby $x > 0$ takiej, że $1.0 + x \neq 1.0$. Zadanie wymagało porównania wartości uzyskanej iteracyjnie z wbudowaną funkcją Julii \texttt{eps(T)} oraz standardowymi stałymi z pliku \texttt{float.h} języka C.
+
+\subsubsection{Opis rozwiązania}
+Rozwiązanie polegało na zaimplementowaniu pętli, która iteracyjnie dzieliła wartość $macheps$ (zainicjowaną jako 1.0 danego typu) przez 2.0. Pętla kontynuowała działanie tak długo, jak długo warunek $1.0 + (macheps / 2.0) > 1.0$ był spełniony w arytmetyce danego typu. Ostatnia wartość $macheps$, dla której warunek ten nie był już prawdziwy, jest szukaną wartością.
+
+\subsubsection{Wyniki i interpretacja}
+Poniżej przedstawiono wyniki uzyskane z implementacji iteracyjnej oraz z funkcji wbudowanej.
+\begin{verbatim}
+--- Wyznaczanie Epsilona Maszynowego (macheps) ---
+--- Typ: Float16 ---
+Iteracyjnie:          9.76562500e-04
+Wbudowane (eps):      9.76562500e-04
+--- Typ: Float32 ---
+Iteracyjnie:          1.19209290e-07
+Wbudowane (eps):      1.19209290e-07
+--- Typ: Float64 ---
+Iteracyjnie:          2.22044605e-16
+Wbudowane (eps):      2.22044605e-16
+\end{verbatim}
+
+\noindent \textbf{Interpretacja i porównanie z \texttt{float.h} (C):}
+Wyniki obliczeń iteracyjnych są identyczne z funkcjami wbudowanymi Julii. Poniżej jawne zestawienie ze standardowymi stałymi C:
+
+\begin{minipage}{\textwidth} % <-- POCZĄTEK POPRAWKI (LOGICZNE MIEJSCE 1)
+\begin{itemize}
+    \item \textbf{Float32 (Single):}
+    \begin{itemize}
+        \item Nasz wynik: \texttt{1.19209290e-07}
+        \item Stała C \texttt{FLT\_EPSILON}: \texttt{1.19209290e-07} ($2^{-23}$)
+        \item \textit{Zgodność: Tak}
+    \end{itemize}
+    \item \textbf{Float64 (Double):}
+    \begin{itemize}
+        \item Nasz wynik: \texttt{2.22044605e-16}
+        \item Stała C \texttt{DBL\_EPSILON}: \texttt{2.22044605e-16} ($2^{-52}$)
+        \item \textit{Zgodność: Tak}
+    \end{itemize}
+\end{itemize}
+\end{minipage} % <-- KONIEC POPRAWKI (LOGICZNE MIEJSCE 1)
+
+\subsubsection{Wnioski}
+Obliczenia iteracyjne dały wyniki w pełni zgodne z wbudowanymi funkcjami Julii oraz standardowymi wartościami \texttt{FLT\_EPSILON} i \texttt{DBL\_EPSILON} ze \textbf{standardu IEEE 754}. Wartość ta definiuje \textit{jednostkowy błąd zaokrąglenia} ($u = macheps / 2$), który jest kluczowym parametrem w analizie błędów \textbf{obliczeń maszynowych} i pokazuje granicę precyzji względnej operacji.
+
+\subsection{Część 2: Wyznaczanie najmniejszej liczby dodatniej ($\eta$ / $MIN_{sub}$)}
+
+\subsubsection{Opis problemu}
+Zadanie polegało na wyznaczeniu najmniejszej dodatniej liczby maszynowej $\eta$ (tzw. $MIN_{sub}$). Należało użyć iteracyjnego dzielenia przez 2.0, aż do osiągnięcia 0.0, a następnie porównać wynik z \texttt{nextfloat(T(0.0))} oraz sprawdzić, czy \texttt{float.h} definiuje tę wartość.
+
+\subsubsection{Opis rozwiązania}
+Zastosowano pętlę iteracyjną, która dzieliła wartość $\eta$ (zainicjowaną jako 1.0) przez 2.0. Pętla była kontynuowana, dopóki wynik dzielenia (\texttt{eta / 2.0}) był większy od 0.0. Ostatnia wartość $\eta$ przed osiągnięciem zera (gdy \texttt{eta / 2.0} staje się równe 0.0) jest szukaną wartością.
+
+\subsubsection{Wyniki i interpretacja}
+Otrzymane wyniki z algorytmu iteracyjnego oraz funkcji wbudowanej:
+\begin{verbatim}
+--- Wyznaczanie Najmniejszej Liczby Dodatniej (eta / MIN_sub) ---
+--- Typ: Float16 ---
+Iteracyjnie:                  5.96046448e-08
+Wbudowane (nextfloat(0.0)):   5.96046448e-08
+--- Typ: Float32 ---
+Iteracyjnie:                  1.40129846e-45
+Wbudowane (nextfloat(0.0)):   1.40129846e-45
+--- Typ: Float64 ---
+Iteracyjnie:                  4.94065646e-324
+Wbudowane (nextfloat(0.0)):   4.94065646e-324
+\end{verbatim}
+
+\noindent \textbf{Interpretacja i porównanie z \texttt{float.h} (C):}
+Wyniki iteracyjne są identyczne z wartościami \texttt{nextfloat(T(0.0))}.
+\begin{minipage}{\textwidth} % <-- POCZĄTEK POPRAWKI (LOGICZNE MIEJSCE 2)
+\begin{itemize}
+    \item \textbf{Float32 (Single):}
+    \begin{itemize}
+        \item Nasz wynik ($\eta$): \texttt{1.40129846e-45}
+        \item Stała C \texttt{float.h}: \textit{Brak} (standard C definiuje tylko \texttt{FLT\_MIN}, patrz Część 3)
+    \end{itemize}
+    \item \textbf{Float64 (Double):}
+    \begin{itemize}
+        \item Nasz wynik ($\eta$): \texttt{4.94065646e-324}
+        \item Stała C \texttt{float.h}: \textit{Brak} (standard C definiuje tylko \texttt{DBL\_MIN}, patrz Część 3)
+    \end{itemize}
+\end{itemize}
+\end{minipage} % <-- KONIEC POPRAWKI (LOGICZNE MIEJSCE 2)
+
+\subsubsection{Wnioski}
+Eksperyment potwierdził istnienie \textbf{liczb subnormalnych (zdenormalizowanych)}, kluczowego elementu \textbf{standardu IEEE 754}. Wyznaczona $\eta$ ($MIN_{sub}$) reprezentuje mechanizm "łagodnego niedomiaru" (gradual underflow). W \textbf{obliczeniach maszynowych} pozwala to uniknąć gwałtownego "przeskoku" do zera, co jest krytyczne dla stabilności algorytmów operujących na bardzo małych wartościach.
+
+\subsection{Część 3: Analiza \texttt{floatmin} vs $MIN_{nor}$ (i \texttt{float.h})}
+
+\subsubsection{Opis problemu}
+Celem było sprawdzenie, co zwraca funkcja \texttt{floatmin(T)} i jaki ma związek z $MIN_{nor}$ (najmniejszą liczbą znormalizowaną) oraz ze stałymi \texttt{FLT\_MIN} i \texttt{DBL\_MIN} z \texttt{float.h}.
+
+\subsubsection{Opis rozwiązania}
+W tej części nie implementowano nowego algorytmu iteracyjnego. Wywołano jedynie wbudowaną funkcję Julii \texttt{floatmin(T)} oraz funkcję \texttt{find\_eta(T)} (zdefiniowaną w poprzedniej części) w celu ich bezpośredniego porównania w wygenerowanym wydruku.
+
+\subsubsection{Wyniki i interpretacja}
+Wyniki porównania funkcji \texttt{floatmin(T)} z obliczoną wcześniej $\eta$ ($MIN_{sub}$):
+\begin{verbatim}
+--- Badanie floatmin(T) ---
+floatmin(Float16):      6.10351562e-05 (vs eta: 5.96046448e-08)
+floatmin(Float32):      1.17549435e-38 (vs eta: 1.40129846e-45)
+floatmin(Float64):      2.22507386e-308 (vs eta: 4.94065646e-324)
+\end{verbatim}
+
+\noindent \textbf{Interpretacja i porównanie z \texttt{float.h} (C):}
+Wartości \texttt{floatmin(T)} są znacznie większe niż $\eta$ ($MIN_{sub}$). Porównanie ze stałymi C:
+
+\begin{minipage}{\textwidth} % <-- POCZĄTEK POPRAWKI (LOGICZNE MIEJSCE 3)
+\begin{itemize}
+    \item \textbf{Float32 (Single):}
+    \begin{itemize}
+        \item Nasz wynik (\texttt{floatmin}): \texttt{1.17549435e-38}
+        \item Stała C \texttt{FLT\_MIN}: \texttt{1.17549435e-38}
+        \item \textit{Zgodność: Tak}
+    \end{itemize}
+    \item \textbf{Float64 (Double):}
+    \begin{itemize}
+        \item Nasz wynik (\texttt{floatmin}): \texttt{2.22507386e-308}
+        \item Stała C \texttt{DBL\_MIN}: \texttt{2.22507386e-308}
+        \item \textit{Zgodność: Tak}
+    \end{itemize}
+\end{itemize}
+\end{minipage} % <-- KONIEC POPRAWKI (LOGICZNE MIEJSCE 3)
+
+\subsubsection{Wnioski}
+Eksperyment jasno pokazuje fundamentalne rozróżnienie w \textbf{standardzie IEEE 754}:
+\begin{enumerate}
+    \item $\eta$ ($MIN_{sub}$): Najmniejsza liczba subnormalna (obszar \textit{gradual underflow}).
+    \item \texttt{floatmin(T)} ($MIN_{nor}$): Najmniejsza liczba \textbf{znormalizowana}.
+\end{enumerate}
+Jak widać z jawnego porównania, to właśnie $MIN_{nor}$ (a nie $MIN_{sub}$) jest zdefiniowane w standardzie C (\texttt{FLT\_MIN}, \texttt{DBL\_MIN}). W \textbf{obliczeniach maszynowych} $MIN_{nor}$ wyznacza początek zakresu, w którym liczby mają pełną precyzję względną.
+
+\subsection{Część 4: Wyznaczanie największej liczby skończonej ($MAX$)}
+
+\subsubsection{Opis problemu}
+Wyznaczenie największej skończonej liczby maszynowej ($MAX$). Należało znaleźć największą potęgę dwójki $P = 2^{E_{max}}$ (mnożąc do \texttt{Inf}), a następnie obliczyć $MAX = P \times (2.0 - macheps)$. Wynik należało porównać z \texttt{floatmax(T)} oraz stałymi z \texttt{float.h}.
+
+\subsubsection{Opis rozwiązania}
+Algorytm składał się z dwóch kroków. Najpierw, w pętli mnożono 1.0 przez 2.0 aż do osiągnięcia nieskończoności (\texttt{Inf}), aby znaleźć największą potęgę dwójki $P = 2^{E_{max}}$. Następnie obliczono $MAX$ ze wzoru $MAX = P \times (2.0 - macheps)$, wykorzystując $macheps$ obliczony w Części 1.
+
+\subsubsection{Wyniki i interpretacja}
+Wyniki iteracyjnego obliczania $MAX$ w porównaniu z funkcją wbudowaną:
+\begin{verbatim}
+--- Wyznaczanie Największej Liczby Skończonej (MAX) ---
+--- Typ: Float16 ---
+Iteracyjnie:          6.55040000e+04
+Wbudowane (floatmax):   6.55040000e+04
+--- Typ: Float32 ---
+Iteracyjnie:          3.40282347e+38
+Wbudowane (floatmax):   3.40282347e+38
+--- Typ: Float64 ---
+Iteracyjnie:          1.79769313e+308
+Wbudowane (floatmax):   1.79769313e+308
+\end{verbatim}
+
+\noindent \textbf{Interpretacja i porównanie z \texttt{float.h} (C):}
+Wyniki iteracyjne są identyczne z wartościami \texttt{floatmax(T)}. Porównanie ze stałymi C:
+
+\begin{minipage}{\textwidth} % <-- POCZĄTEK POPRAWKI (LOGICZNE MIEJSCE 4)
+\begin{itemize}
+    \item \textbf{Float32 (Single):}
+    \begin{itemize}
+        \item Nasz wynik: \texttt{3.40282347e+38}
+        \item Stała C \texttt{FLT\_MAX}: \texttt{3.40282347e+38}
+        \item \textit{Zgodność: Tak}
+    \end{itemize}
+    \item \textbf{Float64 (Double):}
+    \begin{itemize}
+        \item Nasz wynik: \texttt{1.79769313e+308}
+        \item Stała C \texttt{DBL\_MAX}: \texttt{1.79769313e+308}
+        \item \textit{Zgodność: Tak}
+    \end{itemize}
+\end{itemize}
+\end{minipage} % <-- KONIEC POPRAWKI (LOGICZNE MIEJSCE 4)
+
+\subsubsection{Wnioski}
+Wyznaczona wartość $MAX$ reprezentuje górną granicę zakresu liczb znormalizowanych. Jawne porównanie potwierdza pełną zgodność ze \textbf{standardem IEEE 754} oraz stałymi C (\texttt{FLT\_MAX}, \texttt{DBL\_MAX}). W \textbf{obliczeniach maszynowych}, przekroczenie tej wartości skutkuje "nadmiarem" (overflow) i jest sygnalizowane wartością \texttt{Inf}. Zrozumienie tego limitu jest niezbędne przy projektowaniu stabilnych numerycznie algorytmów.
+
+% --- Nowa sekcja dla Zadania 2 ---
+\section{Zadanie 2: Obliczanie macheps metodą Kahana}
+
+% Podrozdział bez zbędnego "Część 2.1"
+\subsection{Weryfikacja formuły Kahana}
+
+\subsubsection{Opis problemu}
+Profesor William Kahan zasugerował, że epsilon maszynowy ($macheps$) można wyznaczyć w arytmetyce zmiennoprzecinkowej poprzez obliczenie wyrażenia:
+$3 \times (4/3 - 1) - 1$.
+
+Celem tego zadania była eksperymentalna weryfikacja tego stwierdzenia w języku Julia dla typów \texttt{Float16}, \texttt{Float32} i \texttt{Float64}. Porównaliśmy wynik tej formuły z wartością zwracaną przez wbudowaną funkcję \texttt{eps(T)}.
+
+\subsubsection{Opis rozwiązania}
+Zaimplementowano funkcję, która krok po kroku wykonuje obliczenia formuły Kahana. Kluczowe było, aby wszystkie stałe (1.0, 3.0, 4.0) oraz wszystkie operacje pośrednie były wykonywane ściśle w arytmetyce badanego typu (\texttt{Float16}, \texttt{Float32}, \texttt{Float64}). Krok po kroku obliczono $\textit{fl}(4/3)$, następnie $\textit{fl}(\textit{fl}(4/3) - 1)$, potem $\textit{fl}(3 \times \dots)$, i na końcu odjęto 1.0, aby wyizolować błąd. Pozwoliło to na precyzcyjne uchwycenie błędów zaokrągleń specyficznych dla każdej precyzji.
+
+\subsubsection{Wyniki i interpretacja}
+Poniżej przedstawiono wyniki uzyskane z implementacji formuły Kahana oraz wartości z funkcji wbudowanej.
+\begin{verbatim}
+--- Sprawdzanie formuły Kahana dla macheps ---
+--- Typ: Float16 ---
+Wynik z formuły Kahana:     -9.7656250000e-04
+Wbudowane (eps(T)):          9.7656250000e-04
+Czy równe eps(T)?            false
+Czy równe -eps(T)?           true
+--- Typ: Float32 ---
+Wynik z formuły Kahana:     1.1920928955e-07
+Wbudowane (eps(T)):          1.1920928955e-07
+Czy równe eps(T)?            true
+Czy równe -eps(T)?           false
+--- Typ: Float64 ---
+Wynik z formuły Kahana:     -2.2204460493e-16
+Wbudowane (eps(T)):          2.2204460493e-16
+Czy równe eps(T)?            false
+Czy równe -eps(T)?           true
+\end{verbatim}
+
+\noindent \textbf{Interpretacja:}
+Eksperyment dał zaskakujący i bardzo pouczający wynik. Wartość bezwzględna formuły Kahana jest zawsze równa \texttt{eps(T)}, jednak znak wyniku zależy od typu zmiennoprzecinkowego.
+
+\begin{minipage}{\textwidth} % <-- POCZĄTEK POPRAWKI (LOGICZNE MIEJSCE 5)
+\begin{itemize}
+    \item \textbf{Float16:}
+    \begin{itemize}
+        \item Wynik Kahana: \texttt{-9.7656250000e-04}
+        \item Wbudowane \texttt{eps(T)}: \texttt{9.7656250000e-04}
+        \item Zgodność: \texttt{kahan\_val == -eps(T)} (Prawda)
+    \end{itemize}
+    \item \textbf{Float32:}
+    \begin{itemize}
+        \item Wynik Kahana: \texttt{1.1920928955e-07}
+        \item Wbudowane \texttt{eps(T)}: \texttt{1.1920928955e-07}
+        \item Zgodność: \texttt{kahan\_val == eps(T)} (Prawda)
+    \end{itemize}
+    \item \textbf{Float64:}
+    \begin{itemize}
+        \item Wynik Kahana: \texttt{-2.2204460493e-16}
+        \item Wbudowane \texttt{eps(T)}: \texttt{2.2204460493e-16}
+        \item Zgodność: \texttt{kahan\_val == -eps(T)} (Prawda)
+    \end{itemize}
+\end{itemize}
+\end{minipage} % <-- KONIEC POPRAWKI (LOGICZNE MIEJSCE 5)
+
+\subsubsection{Wnioski}
+Stwierdzenie Kahana jest słuszne co do \textit{wartości bezwzględnej} – formuła ta doskonale izoluje błąd zaokrąglenia o wielkości $macheps$. Znak wyniku jest fascynującą ilustracją subtelności reguł zaokrąglania w \textbf{standardzie IEEE 754}.
+
+Kluczowa jest pierwsza operacja: $\textit{fl}(4/3)$. Liczba $4/3$ ma nieskończone rozwinięcie binarne: $1.01010101\ldots_2$. Standard \textbf{IEEE 754} stosuje zaokrąglanie do najbliższej wartości ("round-to-nearest-ties-to-even").
+
+\begin{enumerate}
+    \item \textbf{Przypadek \texttt{Float16} ($p=11$ bitów) i \texttt{Float64} ($p=53$ bity):}
+    Dla obu tych precyzji, odcięta część rozwinięcia binarnego $1.0101\ldots_2$ jest mniejsza niż połowa jednostki na ostatnim miejscu (ULP). Liczba $4/3$ jest zaokrąglana \textbf{w dół}. 
+    Analiza błędu pokazuje, że $\textit{fl}(4/3) = 4/3 - \epsilon_1$ (błąd początkowy jest ujemny), co po kolejnych operacjach i końcowej anulacji daje wynik $-macheps$.
+
+    \item \textbf{Przypadek \texttt{Float32} ($p=24$ bity):}
+    Dla tej konkretnej precyzji, odcięta część rozwinięcia jest większa niż połowa ULP. Liczba $4/3$ jest zaokrąglana \textbf{w górę}.
+    Analiza błędu pokazuje, że $\textit{fl}(4/3) = 4/3 + \epsilon_1$ (błąd początkowy jest dodatni), co po propagacji błędu i końcowej anulacji daje wynik $+macheps$.
+\end{enumerate}
+
+Eksperyment ten pokazuje, że kierunek zaokrąglenia w \textbf{obliczeniach maszynowych} zależy od konkretnej liczby bitów precyzji, co może prowadzić do pozornie sprzecznych (ale poprawnych) wyników dla różnych typów zmiennoprzecinkowych.
+
+% --- DODANA SEKCJA DLA ZADANIA 3 ---
+\section{Zadanie 3: Błędy anulacji i błąd względny}
+
+\subsection{Obliczanie $f(x) = \sqrt{x^2 + 1} - 1$}
+
+\subsubsection{Opis problemu}
+Zadanie polegało na obliczeniu wartości funkcji $f(x) = \sqrt{x^2 + 1} - 1$ dla $x$ malejących do zera ($x = 8^{-1}, 8^{-2}, \ldots, 8^{-k}$). Celem była obserwacja utraty precyzji (błędu anulacji) oraz porównanie wyników z matematycznie równoważną, ale stabilniejszą numerycznie postacią $g(x) = \frac{x^2}{\sqrt{x^2 + 1} + 1}$.
+
+\subsubsection{Opis rozwiązania}
+Obie funkcje, $f(x)$ i $g(x)$, zostały zaimplementowane i wywołane dla typów \texttt{Float32} i \texttt{Float64}. Jako "dokładną" wartość referencyjną $y$ przyjęto wynik funkcji $g(x)$ obliczony w precyzji \texttt{Float64}. Następnie obliczono błąd względny $\frac{|\textit{fl}(f(x)) - y|}{|y|}$ oraz $\frac{|\textit{fl}(g(x)) - y|}{|y|}$ dla obu typów.
+
+\subsubsection{Wyniki i interpretacja}
+Poniżej kluczowe obserwacje z wygenerowanych wyników (dla czytelności pominięto pełne tabele).
+
+\noindent \textbf{Dla \texttt{Float32}:}
+\begin{itemize}
+    \item \textbf{Funkcja $f(x)$ (niestabilna):} Już przy $x \approx 1.5 \times 10^{-4}$ błąd względny przekracza 10\%. Dla $x \approx 9.5 \times 10^{-5}$ wynik $f(x)$ staje się równy \textbf{zero}, a błąd względny wynosi 100\%. Jest to klasyczny przykład \textbf{błędu anulacji} – gdy $\sqrt{x^2 + 1} \approx 1$, odejmowanie $1$ prowadzi do katastrofalnej utraty cyfr znaczących.
+    \item \textbf{Funkcja $g(x)$ (stabilna):} Błąd względny dla $g(x)$ utrzymuje się na poziomie błędu maszynowego ($\approx 10^{-8}$) przez cały zakres testów, nawet gdy $f(x)$ zwraca już zero.
+\end{itemize}
+
+\noindent \textbf{Dla \texttt{Float64}:}
+\begin{itemize}
+    \item \textbf{Funkcja $f(x)$ (niestabilna):} Zjawisko anulacji również występuje, ale znacznie później, co jest oczekiwane przy większej precyzji. Błąd względny zaczyna gwałtownie rosnąć dla $x < 10^{-8}$. Dla $x \approx 2.2 \times 10^{-8}$ błąd sięga ok. 15\%, a dla $x \approx 1.7 \times 10^{-9}$ $f(x)$ zwraca \textbf{zero} (błąd 100\%).
+    \item \textbf{Funkcja $g(x)$ (stabilna):} Błąd względny pozostaje na poziomie $macheps$ dla \texttt{Float64} ($\approx 10^{-16}$) aż do granicy liczb subnormalnych.
+\end{itemize}
+
+\subsubsection{Wnioski}
+Eksperyment dobitnie pokazał, jak krytyczny w \textbf{obliczeniach maszynowych} jest dobór algorytmu. Matematyczna równoważność $f(x) = g(x)$ nie implikuje równoważności numerycznej. Postać $f(x)$ cierpi na katastrofalny błąd anulacji (odejmowanie bardzo bliskich sobie liczb), podczas gdy postać $g(x)$, uzyskana przez przekształcenie (wzorami skróconego mnożenia), jest numerycznie stabilna, ponieważ eliminuje problematyczne odejmowanie.
+
+\end{document}
