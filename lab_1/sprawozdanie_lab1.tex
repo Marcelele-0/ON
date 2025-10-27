@@ -391,7 +391,7 @@ Czy delta_z == 2^-53?          true
 \end{itemize}
 
 \subsubsection{Wnioski}
-Eksperyment pokazał, że liczby zmiennoprzecinkowe **nie są** rozmieszczone równomiernie w całym zakresie liczb rzeczywistych, ale są równomiernie (liniowo) rozmieszczone wewnątrz przedziałów $[2^E, 2^{E+1})$.
+Eksperyment pokazał, że liczby zmiennoprzecinkowe  nie są  rozmieszczone równomiernie w całym zakresie liczb rzeczywistych, ale są równomiernie (liniowo) rozmieszczone wewnątrz przedziałów $[2^E, 2^{E+1})$.
 
 \begin{itemize}
     \item W przedziale $[2, 4]$ ($E=1$), krok $\delta_y = 2^{-51}$, czyli $2 \times \delta_{[1,2]}$. Liczby mają postać $x = 2.0 + k \cdot 2^{-51}$.
@@ -407,7 +407,7 @@ W \textbf{standardzie IEEE 754} odstęp (ULP) między liczbami podwaja się przy
 \section{Zadanie 4: Badanie tożsamości \texorpdfstring{$x \cdot (1/x) = 1$}{x * (1/x) = 1}}
 
 \subsubsection{Opis problemu}
-Zadanie polegało na (a) znalezieniu eksperymentalnie dowolnej oraz (b) znalezieniu **najmniejszej** liczby zmiennopozycyjnej $x$ w arytmetyce \texttt{Float64} w przedziale $(1, 2)$, dla której tożsamość matematyczna $x \cdot (1/x) = 1$ nie jest spełniona. Oczekiwany błąd to $fl(x \cdot fl(1/x)) \neq 1$.
+Zadanie polegało na (a) znalezieniu eksperymentalnie dowolnej oraz (b) znalezieniu  najmniejszej  liczby zmiennopozycyjnej $x$ w arytmetyce \texttt{Float64} w przedziale $(1, 2)$, dla której tożsamość matematyczna $x \cdot (1/x) = 1$ nie jest spełniona. Oczekiwany błąd to $fl(x \cdot fl(1/x)) \neq 1$.
 
 \subsubsection{Opis rozwiązania}
 Zaimplementowano metodę "brute-force". Skrypt inicjuje $x = 1.0$ i w pętli iteracyjnie przechodzi do następnej liczby maszynowej ($x = \texttt{nextfloat(x)}$), zliczając liczbę kroków $k$. Dla każdej liczby $x$ oblicza wartość $v = fl(x \cdot fl(1/x))$. Pętla zatrzymuje się, gdy $v \neq 1.0$. Aby umożliwić analizę, program drukuje stan z ostatniej "poprawnej" iteracji ($k-1$) oraz z pierwszej "błędnej" iteracji ($k$). Skrypt został uruchomiony z terminala (`cmd`), aby zapewnić kompilację JIT i rozsądny czas wykonania.
@@ -442,7 +442,6 @@ fl(x_k * fl(1/x_k)) =   9.99999999999999889e-01
 Bitstring wyniku:     001111111110111111111111...1111111
 Wynik != 1.0:         true
 
---- Koniec Zadania 4 ---
 \end{verbatim}
 
 \noindent \textbf{Interpretacja:}
@@ -455,7 +454,7 @@ Wynik != 1.0:         true
 \end{itemize}
 
 \subsubsection{Wnioski}
-Eksperyment dowiódł, że tożsamość $x \cdot (1/x) = 1$ nie jest zachowana w \textbf{obliczeniach maszynowych}. Jest to skutek **kumulacji błędów zaokrągleń** w standardzie \textbf{IEEE 754}.
+Eksperyment dowiódł, że tożsamość $x \cdot (1/x) = 1$ nie jest zachowana w \textbf{obliczeniach maszynowych}. Jest to skutek  kumulacji błędów zaokrągleń  w standardzie \textbf{IEEE 754}.
 
 Występują tu dwa błędy:
 \begin{enumerate}
@@ -521,26 +520,26 @@ Metoda           Wynik Obliczony             Błąd Względny
 
 ========================================
 Wartość referencyjna:   -1.006571070000000e-11
---- Koniec Zadania 5 ---
+
 \end{verbatim}
 
 \noindent \textbf{Interpretacja:}
 \begin{itemize}
-    \item \textbf{Float32:} Wyniki są katastrofalne. Wektor iloczynów `terms` zawiera dwie bardzo duże liczby o przeciwnych znakach ($t_2 \approx -2.76 \cdot 10^6$ i $t_4 \approx +2.76 \cdot 10^6$). Ich suma powinna być bliska zeru, ale w precyzji \texttt{Float32} (ok. 7 cyfr dziesiętnych) dochodzi do **katastrofalnej anulacji**. Odejmując liczby bliskie sobie co do wartości bezwzględnej, tracimy niemal wszystkie cyfry znaczące. Ostateczne wyniki ($\approx -0.5$) są rzędy wielkości od wartości referencyjnej ($ \approx -10^{-11}$), a błędy względne są gigantyczne ($ \approx 10^{10}$). Kolejność sumowania ma niewielki wpływ przy tak dużej utracie precyzji.
+    \item \textbf{Float32:} Wyniki są katastrofalne. Wektor iloczynów `terms` zawiera dwie bardzo duże liczby o przeciwnych znakach ($t_2 \approx -2.76 \cdot 10^6$ i $t_4 \approx +2.76 \cdot 10^6$). Ich suma powinna być bliska zeru, ale w precyzji \texttt{Float32} (ok. 7 cyfr dziesiętnych) dochodzi do  katastrofalnej anulacji . Odejmując liczby bliskie sobie co do wartości bezwzględnej, tracimy niemal wszystkie cyfry znaczące. Ostateczne wyniki ($\approx -0.5$) są rzędy wielkości od wartości referencyjnej ($ \approx -10^{-11}$), a błędy względne są gigantyczne ($ \approx 10^{10}$). Kolejność sumowania ma niewielki wpływ przy tak dużej utracie precyzji.
     
     \item \textbf{Float64:} Wyniki są znacznie lepsze, rzędu $10^{-10}$, ale nadal obarczone sporym błędem względnym ($ \approx 10^1$). Precyzja \texttt{Float64} (ok. 16 cyfr dziesiętnych) pozwala na dokładniejsze obliczenie różnicy między dużymi składnikami $t_2$ i $t_4$, ale wynik nadal jest bardzo bliski zeru, co uwypukla błędy zaokrągleń pozostałych operacji.
     \begin{itemize}
-        \item Różne wyniki dla metod (a) i (b) potwierdzają, że dodawanie zmiennoprzecinkowe **nie jest łączne**.
+        \item Różne wyniki dla metod (a) i (b) potwierdzają, że dodawanie zmiennoprzecinkowe  nie jest łączne .
         \item Metody (c) i (d), sortujące składniki, dały wynik dokładnie 0.0. Jest to mniej dokładne niż metody (a) i (b), co sugeruje, że sortowanie nie zawsze jest najlepszą strategią, szczególnie przy silnej anulacji.
     \end{itemize}
 \end{itemize}
 
 \subsubsection{Wnioski}
-Eksperyment dobitnie pokazał zjawisko **katastrofalnej anulacji** w \textbf{obliczeniach maszynowych}. Odejmując dwie bliskie sobie, duże liczby, tracimy precyzję. Skutki są druzgocące w niskiej precyzji (\texttt{Float32}), ale zauważalne nawet w \texttt{Float64}.
+Eksperyment dobitnie pokazał zjawisko  katastrofalnej anulacji  w \textbf{obliczeniach maszynowych}. Odejmując dwie bliskie sobie, duże liczby, tracimy precyzję. Skutki są druzgocące w niskiej precyzji (\texttt{Float32}), ale zauważalne nawet w \texttt{Float64}.
 
 Potwierdzono również, że kolejność sumowania ma znaczenie (brak łączności dodawania w arytmetyce zmiennoprzecinkowej), co widać po różnych wynikach metod (a) i (b) dla \texttt{Float64}.
 
-Algorytmy sortujące (c, d), często zalecane do minimalizacji błędów przez sumowanie najpierw małych liczb, w tym specyficznym przypadku dały mniej dokładny wynik (0.0) niż proste sumowanie w przód/tył. Podkreśla to, że nie ma uniwersalnie najlepszego algorytmu sumowania, a wybór metody zależy od charakteru danych i potencjalnego występowania anulacji. Zadanie to ilustruje fundamentalne problemy **stabilności numerycznej** algorytmów.
+Algorytmy sortujące (c, d), często zalecane do minimalizacji błędów przez sumowanie najpierw małych liczb, w tym specyficznym przypadku dały mniej dokładny wynik (0.0) niż proste sumowanie w przód/tył. Podkreśla to, że nie ma uniwersalnie najlepszego algorytmu sumowania, a wybór metody zależy od charakteru danych i potencjalnego występowania anulacji. Zadanie to ilustruje fundamentalne problemy  stabilności numerycznej  algorytmów.
 
 \taskseparator
 % --- KONIEC ZADANIA 5 ---
@@ -579,7 +578,6 @@ k        x = 8^(-k)           f(x)                       g(x)
 
 Przerywam: f(x) stało się zerem lub g(x) osiągnęło limit precyzji.
 
---- Koniec Zadania 6 ---
 \end{verbatim}
 
 \noindent \textbf{Interpretacja:}
@@ -587,16 +585,16 @@ Przerywam: f(x) stało się zerem lub g(x) osiągnęło limit precyzji.
     \item Dla dużych wartości $x$ (małe $k$), wyniki $f(x)$ i $g(x)$ są bardzo zbliżone.
     \item W miarę jak $x$ maleje (rośnie $k$), różnica między $f(x)$ a $g(x)$ staje się zauważalna, chociaż obie wartości maleją.
     \item Przy $k=8$ ($x \approx 6 \cdot 10^{-8}$), $f(x)$ i $g(x)$ dają wyniki różniące się na ostatnich cyfrach znaczących.
-    \item Przy $k=9$ ($x \approx 7 \cdot 10^{-9}$), następuje załamanie obliczeń dla $f(x)$. Wynik staje się dokładnie \texttt{0.0}. W tym momencie $\sqrt{x^2+1}$ jest tak bliskie 1, że w arytmetyce \texttt{Float64} jest zaokrąglane do dokładnie \texttt{1.0}. Operacja $1.0 - 1.0$ daje zero. Jest to klasyczny przykład **katastrofalnej anulacji** (odejmowanie dwóch bardzo bliskich sobie liczb).
+    \item Przy $k=9$ ($x \approx 7 \cdot 10^{-9}$), następuje załamanie obliczeń dla $f(x)$. Wynik staje się dokładnie \texttt{0.0}. W tym momencie $\sqrt{x^2+1}$ jest tak bliskie 1, że w arytmetyce \texttt{Float64} jest zaokrąglane do dokładnie \texttt{1.0}. Operacja $1.0 - 1.0$ daje zero. Jest to klasyczny przykład  katastrofalnej anulacji  (odejmowanie dwóch bardzo bliskich sobie liczb).
     
     \item Funkcja $g(x)$ nadal daje poprawny, mały, ale niezerowy wynik ($ \approx 2.8 \cdot 10^{-17}$). Forma $g(x)$ unika odejmowania bliskich liczb; zamiast tego wykonuje stabilne numerycznie dodawanie $\sqrt{x^2+1} + 1$.
 \end{itemize}
 
 \subsubsection{Wnioski}
-Eksperyment pokazał, że chociaż funkcje $f(x)$ i $g(x)$ są matematycznie równoważne, ich **stabilność numeryczna** w \textbf{obliczeniach maszynowych} jest drastycznie różna dla małych wartości $x$.
+Eksperyment pokazał, że chociaż funkcje $f(x)$ i $g(x)$ są matematycznie równoważne, ich  stabilność numeryczna  w \textbf{obliczeniach maszynowych} jest drastycznie różna dla małych wartości $x$.
 \begin{itemize}
-    \item Wzór $f(x) = \sqrt{x^2+1} - 1$ jest **niestabilny numerycznie** dla $x \to 0$ z powodu **katastrofalnej anulacji**. Prowadzi to do całkowitej utraty cyfr znaczących i błędnego wyniku (zero).
-    \item Wzór $g(x) = x^2 / (\sqrt{x^2+1} + 1)$ jest **stabilny numerycznie** dla $x \to 0$. Unika on problematycznego odejmowania, zastępując je stabilnym dodawaniem i dzieleniem.
+    \item Wzór $f(x) = \sqrt{x^2+1} - 1$ jest  niestabilny numerycznie  dla $x \to 0$ z powodu  katastrofalnej anulacji . Prowadzi to do całkowitej utraty cyfr znaczących i błędnego wyniku (zero).
+    \item Wzór $g(x) = x^2 / (\sqrt{x^2+1} + 1)$ jest  stabilny numerycznie  dla $x \to 0$. Unika on problematycznego odejmowania, zastępując je stabilnym dodawaniem i dzieleniem.
 \end{itemize}
 Wyniki obliczeń dla $g(x)$ są wiarygodne w całym przetestowanym zakresie, podczas gdy wyniki dla $f(x)$ stają się bezużyteczne dla $x < 10^{-8}$. To zadanie jest doskonałym przykładem, jak przekształcenie algebraiczne wyrażenia może radykalnie poprawić dokładność obliczeń w arytmetyce zmiennoprzecinkowej zgodnej ze standardem \textbf{IEEE 754}.
 
@@ -641,14 +639,13 @@ n     h = 2^(-n)         f_approx'(x0)           |f'(x0) - f_approx'(x0)|   1.0 
 53    1.11022302e-16       0.00000000000000000e+00       1.16942282e-01         1.00000000000000000e+00
 54    5.55111512e-17       0.00000000000000000e+00       1.16942282e-01         1.00000000000000000e+00
 
---- Koniec Zadania 7 ---
 \end{verbatim}
 
 \noindent \textbf{Interpretacja:}
 \begin{itemize}
     \item \textbf{Początkowa poprawa:} Dla dużych $h$ (małe $n$), błąd jest duży. W miarę zmniejszania $h$, błąd maleje. Jest to zgodne z teorią, ponieważ \textbf{błąd obcięcia} (truncation error) metody różnicy skończonej jest proporcjonalny do $h$ (dokładniej $O(h)$).
     \item \textbf{Minimum błędu:} Błąd osiąga minimum w okolicach $n=28$, gdzie $h \approx 3.7 \cdot 10^{-9}$, a błąd wynosi ok. $4.8 \cdot 10^{-9}$.
-    \item \textbf{Wzrost błędu:} Dalsze zmniejszanie $h$ (zwiększanie $n$) powoduje, że błąd \textbf{ponownie rośnie}. Jest to spowodowane dominacją \textbf{błędu zaokrągleń} (round-off error). W liczniku $\tilde{f}'(x_0)$ odejmujemy dwie bardzo bliskie sobie wartości, $f(x_0+h)$ i $f(x_0)$, co prowadzi do **katastrofalnej anulacji**. Dodatkowo, dzielenie przez bardzo małe $h$ wzmacnia ten błąd.
+    \item \textbf{Wzrost błędu:} Dalsze zmniejszanie $h$ (zwiększanie $n$) powoduje, że błąd \textbf{ponownie rośnie}. Jest to spowodowane dominacją \textbf{błędu zaokrągleń} (round-off error). W liczniku $\tilde{f}'(x_0)$ odejmujemy dwie bardzo bliskie sobie wartości, $f(x_0+h)$ i $f(x_0)$, co prowadzi do  katastrofalnej anulacji . Dodatkowo, dzielenie przez bardzo małe $h$ wzmacnia ten błąd.
     \item \textbf{Zachowanie $1.0 + h$:} Obserwacja wartości $1.0 + h$ pokazuje, że dla $n=53$ ($h \approx 1.1 \cdot 10^{-16}$), wartość $1.0 + h$ jest zaokrąglana do dokładnie $1.0$. Wtedy $x_0 + h$ staje się równe $x_0$, licznik aproksymacji pochodnej $f(x_0) - f(x_0)$ staje się zero, a przybliżona pochodna również wynosi zero. Błąd aproksymacji staje się równy wartości bezwzględnej dokładnej pochodnej.
     \item \textbf{Dziwny wynik dla n=52:} Dla $n=52$, $h = \texttt{eps(1.0)} / 2$. Wtedy $1.0 + h$ zaokrągla się do $1.0 + \texttt{eps(1.0)}$, a $x_0+h$ do $x_0 + \texttt{eps(1.0)}$. Obliczenie $(f(x_0+\epsilon) - f(x_0)) / (\epsilon/2)$ daje bardzo niedokładny wynik.
 \end{itemize}
@@ -658,7 +655,7 @@ Eksperyment ilustruje fundamentalny problem w numerycznym różniczkowaniu: wyb�
 \begin{itemize}
     \item Zbyt duże $h$ prowadzi do dużego \textbf{błędu obcięcia} metody.
     % POPRAWKA: Brakująca klamra } po 'zaokrągleń'
-    \item Zbyt małe $h$ prowadzi do dominacji \textbf{błędu zaokrągleń} spowodowanego **katastrofalną anulacją** w liczniku i wzmocnieniem przez mały mianownik.
+    \item Zbyt małe $h$ prowadzi do dominacji \textbf{błędu zaokrągleń} spowodowanego  katastrofalną anulacją  w liczniku i wzmocnieniem przez mały mianownik.
 \end{itemize}
 Istnieje optymalna wartość $h$, która minimalizuje sumę tych dwóch błędów. W naszym przypadku dla \texttt{Float64} było to $h \approx 10^{-8}$ do $10^{-9}$.
 
@@ -668,8 +665,3 @@ Obserwacja $1.0 + h$ pokazała, jak ograniczenia precyzji maszynowej (\textbf{st
 % --- KONIEC ZADANIA 7 ---
 
 \end{document}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%   KONIEC PLIKU
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
