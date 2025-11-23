@@ -1,0 +1,102 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   UNIWERSALNY SZABLON SPRAWOZDANIA - METODY NUMERYCZNE
+%   Autor: Marcel Musiałek (279704)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% --- 1. USTAWIENIA DOKUMENTU ---
+\documentclass[11pt, a4paper]{article}
+
+% --- 2. PAKIETY JĘZYKOWE I KODOWANIE ---
+\usepackage[utf8]{inputenc}     % Kodowanie pliku (UTF-8)
+\usepackage[T1]{fontenc}        % Kodowanie czcionek (dla polskich znaków w PDF)
+\usepackage{lmodern}            % Ładniejsza, wektorowa czcionka
+\usepackage[polish]{babel}      % Polskie nazwy (np. "Spis treści", "Rysunek")
+
+% --- 3. GEOMETRIA STRONY ---
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    margin=2.5cm,               % Marginesy 2.5cm z każdej strony
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+% --- 4. MATEMATYKA I KOD ---
+\usepackage{amsmath}            % Rozszerzone wzory matematyczne
+\usepackage{amssymb}            % Symbole matematyczne
+\usepackage{verbatim}           % Środowisko do wklejania outputu z konsoli
+\usepackage{graphicx}           % Obsługa obrazków (gdybyś chciał wstawić wykres)
+\usepackage{float}              % Lepsze pozycjonowanie obrazków [H]
+
+% --- 5. LINKI I ZAKŁADKI (Hyperref) ---
+% Ładujemy na końcu, aby uniknąć konfliktów.
+% Opcja unicode=true pomaga z polskimi znakami w zakładkach.
+\usepackage[unicode=true, colorlinks=true, linkcolor=black, urlcolor=blue, pdfusetitle]{hyperref}
+
+% --- 6. WŁASNE KOMENDY ---
+% Linia oddzielająca zadania (bezpieczna wersja)
+\newcommand{\taskseparator}{\vspace{0.5cm}\leavevmode\leaders\hrule height 0.5pt\hfill\kern0pt\vspace{0.5cm}}
+
+% Komenda do formatowania nazw zmiennych w tekście (np. \code{macheps})
+\newcommand{\code}[1]{\texttt{#1}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   DANE AUTORA (Zmień tylko numer listy)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{\textbf{Sprawozdanie z Laboratorium Metod Numerycznych} \\ Lista nr [X]} % <--- TU ZMIEŃ NUMER LISTY
+\author{Marcel Musiałek \\ Indeks: 279704}
+\date{\today}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   TREŚĆ DOKUMENTU
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+% Generowanie strony tytułowej
+\maketitle
+
+% Generowanie spisu treści (wymaga dwukrotnej kompilacji)
+\tableofcontents
+\newpage
+
+% -----------------------------------------------------------------------------
+% TU ZACZYNAJĄ SIĘ ZADANIA
+% (Wklejaj tutaj wygenerowane sekcje zadań)
+% -----------------------------------------------------------------------------
+
+% Przykładowa struktura zadania (do skopiowania lub usunięcia):
+
+% \section{Zadanie 1: Tytuł zadania}
+%
+% \subsection{Opis problemu}
+% Krótki opis co badamy...
+%
+% \subsection{Opis rozwiązania}
+% Opis algorytmu i implementacji...
+%
+% \subsection{Wyniki i interpretacja}
+% \begin{verbatim}
+% (Tu wklejamy output z konsoli Julii)
+% \end{verbatim}
+% \textbf{Interpretacja:} ...
+%
+% \subsection{Wnioski}
+% Podsumowanie teoretyczne...
+%
+% \taskseparator
+
+% -----------------------------------------------------------------------------
+% KONIEC ZADAŃ
+% -----------------------------------------------------------------------------
+
+\end{document}

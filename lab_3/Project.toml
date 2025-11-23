@@ -1,0 +1,7 @@
+name = "lab_3"
+uuid = "12345678-1234-1234-1234-123456789012"
+authors = ["Marcel Musiałek <279704>"]
+version = "0.1.0"
+
+[deps]
+Printf = "de0858da-6303-5e67-8744-51ed9e6e409f"
