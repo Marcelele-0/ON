@@ -21,7 +21,6 @@ function main()
     y_nodes = [0.0, 1.0, 6.0]
     
     println("\n1. Test ilorazów różnicowych (Zad 1)")
-    # Używamy pełnej nazwy modułu dla bezpieczeństwa, jeśli export nie zadziałał
     fx = Interpolacja.ilorazyRoznicowe(x_nodes, y_nodes)
     println("   Obliczone ilorazy: ", fx)
     

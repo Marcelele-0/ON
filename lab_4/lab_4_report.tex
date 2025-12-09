@@ -1,0 +1,337 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   UNIWERSALNY SZABLON SPRAWOZDANIA - Obliczenia Naukowe
+%   Autor: Marcel Musiałek (279704)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% --- 1. USTAWIENIA DOKUMENTU ---
+\documentclass[11pt, a4paper]{article}
+
+% --- 2. PAKIETY JĘZYKOWE I KODOWANIE ---
+\usepackage[utf8]{inputenc}     % Kodowanie pliku (UTF-8)
+\usepackage[T1]{fontenc}        % Kodowanie czcionek (dla polskich znaków w PDF)
+\usepackage{lmodern}            % Ładniejsza, wektorowa czcionka
+\usepackage[polish]{babel}      % Polskie nazwy (np. "Spis treści", "Rysunek")
+
+% --- 3. GEOMETRIA STRONY ---
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    margin=2.5cm,               % Marginesy 2.5cm z każdej strony
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+% --- 4. MATEMATYKA I KOD ---
+\usepackage{amsmath}            % Rozszerzone wzory matematyczne
+\usepackage{amssymb}            % Symbole matematyczne
+\usepackage{verbatim}           % Środowisko do wklejania outputu z konsoli
+\usepackage{graphicx}           % Obsługa obrazków
+\usepackage{float}              % Lepsze pozycjonowanie obrazków [H]
+\usepackage{enumitem}           % Lepsze formatowanie list
+\usepackage{subcaption}         % Umożliwia grupowanie obrazków (subfigures)
+
+% --- 5. LINKI I ZAKŁADKI (Hyperref) ---
+\usepackage[unicode=true, colorlinks=true, linkcolor=black, urlcolor=blue, pdfusetitle]{hyperref}
+
+% --- 6. WŁASNE KOMENDY ---
+\newcommand{\taskseparator}{\vspace{0.5cm}\leavevmode\leaders\hrule height 0.5pt\hfill\kern0pt\vspace{0.5cm}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   DANE AUTORA
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{\textbf{Sprawozdanie z Laboratorium Obliczeń Naukowych} \\ Lista nr 4: Interpolacja}
+\author{Marcel Musiałek \\ Indeks: 279704}
+\date{\today}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   TREŚĆ DOKUMENTU
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+% -----------------------------------------------------------------------------
+% ZADANIA 1-4
+% -----------------------------------------------------------------------------
+
+\section{Implementacja Metod (Zadania 1--4)}
+
+Stworzono moduł \code{Interpolacja} w języku Julia, zawierający następujące funkcje:
+
+\subsection{Zadanie 1: Ilorazy różnicowe}
+\begin{itemize}
+    \item \textbf{Funkcja:} \code{ilorazyRoznicowe(x, f)}
+    \item \textbf{Opis:} Oblicza współczynniki wielomianu Newtona.
+    \item \textbf{Optymalizacja:} Zgodnie z poleceniem, nie użyto macierzy dwuwymiarowej. Algorytm działa na wektorze jednowymiarowym, aktualizując go ,,w miejscu'', co redukuje złożoność pamięciową do $O(n)$.
+\end{itemize}
+
+\subsection{Zadanie 2: Wartość wielomianu}
+\begin{itemize}
+    \item \textbf{Funkcja:} \code{warNewton(x, fx, t)}
+    \item \textbf{Opis:} Oblicza wartość wielomianu w punkcie $t$.
+    \item \textbf{Optymalizacja:} Zastosowano uogólniony schemat Hornera, co pozwala na obliczenie wartości w czasie $O(n)$ bez jawnego potęgowania.
+\end{itemize}
+
+\subsection{Zadanie 3: Postać naturalna}
+\begin{itemize}
+    \item \textbf{Funkcja:} \code{naturalna(x, fx)}
+    \item \textbf{Opis:} Przelicza współczynniki z bazy Newtona na bazę naturalną ($a_n x^n + \dots + a_0$).
+    \item \textbf{Działanie:} Algorytm rekurencyjnie wymnaża czynniki liniowe $(x - x_k)$. Czas działania to $O(n^2)$.
+\end{itemize}
+
+\subsection{Zadanie 4: Rysowanie interpolacji}
+\begin{itemize}
+    \item \textbf{Funkcja:} \code{rysujNnfx(f, a, b, n; wezly=:rownoodlegle)}
+    \item \textbf{Opis:} Rysuje wykres funkcji $f(x)$ i jej wielomianu interpolacyjnego Newtona (stopnia $n$) na przedziale $[a, b]$.
+    \item \textbf{Węzły:} Możliwość wyboru węzłów równoodległych lub Czebyszewa. Funkcja wykorzystuje \code{ilorazyRoznicowe} i \code{warNewton}. Do wizualizacji użyto pakietu \code{Plots}.
+\end{itemize}
+
+\taskseparator
+
+% -----------------------------------------------------------------------------
+% WERYFIKACJA
+% -----------------------------------------------------------------------------
+
+\section{Weryfikacja poprawności}
+
+Algorytmy przetestowano na wielomianie $P(x) = 2x^2 + 3x + 1$. Program poprawnie wyznaczył:
+\begin{itemize}
+    \item ilorazy różnicowe: \code{[0.0, 1.0, 2.0]},
+    \item wartość w punkcie $x=2$: wynik \code{15.0},
+    \item współczynniki naturalne: \code{[1.0, 3.0, 2.0]}.
+\end{itemize}
+
+\subsection{Wykresy testowe}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wykres_rownoodlegle.png}
+        \caption{Węzły równoodległe (n=10)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wykres_czebyszew.png}
+        \caption{Węzły Czebyszewa (n=10)}
+    \end{subfigure}
+    \caption{Porównanie interpolacji dla wielomianu testowego}
+\end{figure}
+
+\subsection{Wnioski}
+\begin{itemize}
+    \item Algorytmy zostały poprawnie zaimplementowane.
+    \item Na wykresach widać, że przy zastosowaniu węzłów równoodległych pojawiają się wyraźne błędy (oscylacje) na krańcach przedziału.
+    \item Zastosowanie węzłów Czebyszewa znacząco poprawia wynik. Wynika to z faktu, że węzły te są zagęszczone na brzegach przedziału, co pozwala wielomianowi lepiej dopasować się do funkcji w tych newralgicznych miejscach i eliminuje duże odchylenia.
+\end{itemize}
+
+\taskseparator
+
+% -----------------------------------------------------------------------------
+% ZADANIE 5
+% -----------------------------------------------------------------------------
+
+\section{Zadanie 5: Zbieżność dla funkcji gładkich}
+
+Zbadano zachowanie interpolacji na węzłach równoodległych dla funkcji klasy $C^\infty$ (gładkich). Sprawdzono, czy błąd maleje wraz ze wzrostem stopnia wielomianu ($n = 5, 10, 15$).
+
+\subsection{Przypadek A: $f(x) = e^x$ na przedziale $[0, 1]$}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad5_a_n5.png}
+        \caption{$n=5$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad5_a_n10.png}
+        \caption{$n=10$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad5_a_n15.png}
+        \caption{$n=15$}
+    \end{subfigure}
+    \caption{Interpolacja $e^x$, węzły równoodległe}
+\end{figure}
+
+\noindent \textbf{Obserwacje:} \\
+Funkcja $e^x$ jest bardzo regularna. Już dla $n=5$ przybliżenie jest dobre. Wraz ze wzrostem $n$ wielomian interpolacyjny idealnie pokrywa się z funkcją. Nie widać żadnych negatywnych efektów na brzegach.
+
+\subsection{Przypadek B: $f(x) = x^2 \sin(x)$ na przedziale $[-1, 1]$}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad5_b_n5.png}
+        \caption{$n=5$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad5_b_n10.png}
+        \caption{$n=10$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad5_b_n15.png}
+        \caption{$n=15$}
+    \end{subfigure}
+    \caption{Interpolacja $x^2 \sin(x)$, węzły równoodległe}
+\end{figure}
+
+\noindent \textbf{Obserwacje:} \\
+Mimo bardziej ,,falistego'' kształtu funkcji, interpolacja na węzłach równoodległych działa poprawnie. Zwiększanie liczby węzłów ($n$) systematycznie zmniejsza błąd interpolacji. Dla $n=15$ wykresy są niemal nierozróżnialne.
+
+\subsection{Wniosek z Zadania 5}
+Dla funkcji gładkich na krótkich przedziałach, interpolacja na węzłach równoodległych jest zbieżna i skuteczna.
+
+\taskseparator
+
+% -----------------------------------------------------------------------------
+% ZADANIE 6
+% -----------------------------------------------------------------------------
+
+\section{Zadanie 6: Granice interpolacji (Zjawisko Rungego)}
+
+Zbadano funkcje trudne, porównując węzły równoodległe (R) i Czebyszewa (C) dla stopni $n = 5, 10, 15$.
+
+\subsection{Przypadek A: $f(x) = |x|$ na przedziale $[-1, 1]$ (Ostrze)}
+
+\subsubsection*{Węzły Równoodległe}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_a_n5_rown.png}
+        \caption{$n=5$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_a_n10_rown.png}
+        \caption{$n=10$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_a_n15_rown.png}
+        \caption{$n=15$}
+    \end{subfigure}
+    \caption{Funkcja $|x|$ - Węzły równoodległe}
+\end{figure}
+
+\subsubsection*{Węzły Czebyszewa}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_a_n5_czeb.png}
+        \caption{$n=5$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_a_n10_czeb.png}
+        \caption{$n=10$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_a_n15_czeb.png}
+        \caption{$n=15$}
+    \end{subfigure}
+    \caption{Funkcja $|x|$ - Węzły Czebyszewa}
+\end{figure}
+
+\noindent \textbf{Obserwacje:}
+\begin{itemize}
+    \item Dla węzłów równoodległych, próba odwzorowania szpica w $x=0$ powoduje zafalowanie wielomianu na bokach.
+    \item Dla węzłów Czebyszewa, wielomian znacznie lepiej radzi sobie z ostrzem, a błąd na reszcie przedziału jest minimalny.
+\end{itemize}
+
+\subsection{Przypadek B: $f(x) = \frac{1}{1 + x^2}$ na przedziale $[-5, 5]$ (Funkcja Rungego)}
+
+To jest kluczowy test stabilności interpolacji.
+
+\subsubsection*{Ewolucja błędu dla węzłów Równoodległych}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_b_n5_rown.png}
+        \caption{$n=5$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_b_n10_rown.png}
+        \caption{$n=10$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_b_n15_rown.png}
+        \caption{$n=15$}
+    \end{subfigure}
+    \caption{Runge - Węzły równoodległe}
+\end{figure}
+
+\subsubsection*{Rozwiązanie problemu - Węzły Czebyszewa}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_b_n5_czeb.png}
+        \caption{$n=5$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_b_n10_czeb.png}
+        \caption{$n=10$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{zad6_b_n15_czeb.png}
+        \caption{$n=15$}
+    \end{subfigure}
+    \caption{Runge - Węzły Czebyszewa}
+\end{figure}
+
+\subsection{Analiza}
+To klasyczny przykład testujący stabilność interpolacji.
+\begin{itemize}
+    \item \textbf{Węzły równoodległe:} Obserwujemy klasyczne \textbf{Zjawisko Rungego}. Dla $n=10$ i $n=15$ wielomian wpada w silne oscylacje na krańcach przedziału, osiągając wartości wielokrotnie przekraczające zakres funkcji. Interpolacja jest rozbieżna, co wynika z niekorzystnego układu węzłów powodującego gwałtowny wzrost czynnika iloczynowego $\prod(x-x_i)$ we wzorze na błąd.
+    \item \textbf{Węzły Czebyszewa:} Interpolacja jest zbieżna. Zastosowanie węzłów będących zerami wielomianu Czebyszewa zagęszcza punkty pomiarowe na krańcach przedziału. Zgodnie z teorią, minimalizuje to normę czynnika wielomianowego w oszacowaniu błędu, co skutecznie eliminuje oscylacje Rungego. Wielomian dla $n=15$ niemal idealnie pokrywa się z zadaną funkcją.
+\end{itemize}
+
+\subsection{Wnioski końcowe}
+Wybór rodzaju węzłów ma kluczowe znaczenie dla zbieżności interpolacji wielomianowej.
+\begin{enumerate}
+    \item Dla funkcji analitycznych (jak w przypadku Rungego), węzły równoodległe mogą prowadzić do rozbieżności (dużych oscylacji na brzegach) wraz ze wzrostem stopnia wielomianu.
+    \item Węzły Czebyszewa są rozwiązaniem optymalnym – poprzez zagęszczenie na krańcach minimalizują błąd maksymalny i gwarantują zbieżność jednostajną, eliminując zjawisko Rungego.
+\end{enumerate}
+
+\end{document}

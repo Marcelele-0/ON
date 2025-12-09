@@ -7,8 +7,6 @@ Moduł: Interpolacja
 module Interpolacja
 
 using Plots
-
-# TA LINIA JEST KLUCZOWA:
 export ilorazyRoznicowe, warNewton, naturalna, rysujNnfx
 
 function ilorazyRoznicowe(x::Vector{Float64}, f::Vector{Float64})

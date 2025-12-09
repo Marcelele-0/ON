@@ -15,7 +15,7 @@ function main()
     
     # 1. Definicja funkcji f(x) = 3x - e^x
     f(x) = 3.0 * x - exp(x)
-    
+    a
     # 2. Parametry
     delta = 1e-4
     epsilon = 1e-4
